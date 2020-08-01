@@ -1,0 +1,85 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+    circle {
+        fill: lightblue;
+        stroke: black;
+    }
+
+</style>
+
+<body onload='init()'>
+    <svg width=800 height=1000>
+    </svg>
+    <script>
+        //  Sources: 
+        //  https://www.d3-graph-gallery.com/graph/line_basic.html
+        //  https://stackoverflow.com/questions/21715201/unable-to-reference-d3-js-data-imported-from-a-csv-file-with-spaces-in-the-heade
+
+        async function init() {
+            const data = await d3.csv('Abortion_Demographics.csv');
+
+            const dim = 600;
+            const margin = 100;
+            const axisFactor = 0.5;
+
+            var svg = d3.select('svg')
+                .append('g')
+                .attr('transform', 'translate(' + margin + ',' + margin + ')');
+
+            var x = d3.scaleTime()
+                .domain([new Date(1995, 0, 1), new Date(2012, 0, 1)])
+                .range([0, dim]);
+
+            round = 5000;
+            step = 1000;
+            
+            var ymin = Math.floor(d3.min(data, function(d) {
+                return +d.total;
+            }) / round) * round;
+            
+            var ymax = Math.ceil(d3.max(data, function(d) {
+                return +d.total;
+            }) / round) * round;
+
+            var y = d3.scaleLinear()
+                .domain([ymin, ymax])
+                .range([dim, 0]);
+
+            svg.append('path')
+                .datum(data)
+                .attr('fill', 'none')
+                .attr('stroke', 'steelblue')
+                .attr('stroke-width', 2)
+                .attr('d', d3.line()
+                    .x(function(d) {
+                        return x(new Date(+d.year, 0, 1))
+                    })
+                    .y(function(d) {
+                        return y(+d.total)
+                    })
+                );
+
+            svg.append('g')
+                .attr('transform', 'translate(' + 0 + ',' + dim + ')')
+                .call(d3.axisBottom(x).ticks(d3.timeYear));
+
+            svg.append('text')
+                .attr('transform', 'translate(' + (dim / 2) + ',' + (dim + margin * axisFactor) + ')')
+                .style('text-anchor', 'middle')
+                .text('Year');
+
+            svg.append('g')
+                .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
+                .call(d3.axisLeft(y).tickValues(d3.range(ymin, ymax + step, step)));
+
+            svg.append('text')
+                .attr('transform', 'translate(' + (- margin * axisFactor) + ',' + (dim / 2) + ')rotate(' + -90 + ')')
+                .style('text-anchor', 'middle')
+                .text('Abortions');
+        }
+
+    </script>
+</body>
+
+</html>
