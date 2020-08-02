@@ -1,85 +1,240 @@
 <html>
 <script src='https://d3js.org/d3.v5.min.js'></script>
+<script src='jquery-3.5.1.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+<!--Source for slider: https://codepen.io/caseymhunt/pen/kertA-->
 <style>
-    circle {
-        fill: lightblue;
-        stroke: black;
+    @import url('slider.css');
+
+    #btn {
+        margin: 4px;
+    }
+
+    .container {
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+    }
+
+    .chart {
+        margin-left: -120px;
+        margin-bottom: -100px;
+    }
+    
+    p {
+        margin-left: 100px;
     }
 
 </style>
 
 <body onload='init()'>
-    <svg width=800 height=1000>
-    </svg>
-    <script>
-        //  Sources: 
-        //  https://www.d3-graph-gallery.com/graph/line_basic.html
-        //  https://stackoverflow.com/questions/21715201/unable-to-reference-d3-js-data-imported-from-a-csv-file-with-spaces-in-the-heade
 
-        async function init() {
-            const data = await d3.csv('Abortion_Demographics.csv');
+    <div class='container'>
+        <p>Abortions in Illinois from 1995 - 2012</p>
+        <svg class='chart' width=650 height=650 preserveAspectRatio='xMidYMid meet' /><br />
 
-            const dim = 600;
-            const margin = 100;
-            const axisFactor = 0.5;
+        <!--        <button class='btn' type='button'>Button</button>-->
 
-            var svg = d3.select('svg')
-                .append('g')
-                .attr('transform', 'translate(' + margin + ',' + margin + ')');
+        <div id='dualSlider'>
+            <p>Age Range: <span class='rangeLower'>0 - </span>
+                <span class='rangeUpper'>45+</span>
 
-            var x = d3.scaleTime()
-                .domain([new Date(1995, 0, 1), new Date(2012, 0, 1)])
-                .range([0, dim]);
+            </p>
+            <div class='sliderStep'>
+                <div id='slider'></div>
+            </div>
+        </div>
 
-            round = 5000;
-            step = 1000;
-            
-            var ymin = Math.floor(d3.min(data, function(d) {
-                return +d.total;
-            }) / round) * round;
-            
-            var ymax = Math.ceil(d3.max(data, function(d) {
-                return +d.total;
-            }) / round) * round;
+    </div>
+</body>
 
-            var y = d3.scaleLinear()
-                .domain([ymin, ymax])
-                .range([dim, 0]);
+<script>
+    // Source: https://www.w3resource.com/javascript-exercises/javascript-array-exercise-19.php
+    function sumArr(array1, array2) {
+        var result = [];
+        var ctr = 0;
+        var x = 0;
 
-            svg.append('path')
-                .datum(data)
-                .attr('fill', 'none')
-                .attr('stroke', 'steelblue')
-                .attr('stroke-width', 2)
-                .attr('d', d3.line()
-                    .x(function(d) {
-                        return x(new Date(+d.year, 0, 1))
-                    })
-                    .y(function(d) {
-                        return y(+d.total)
-                    })
-                );
+        if (array1.length === 0)
+            return;
+        if (array2.length === 0)
+            return;
 
-            svg.append('g')
-                .attr('transform', 'translate(' + 0 + ',' + dim + ')')
-                .call(d3.axisBottom(x).ticks(d3.timeYear));
-
-            svg.append('text')
-                .attr('transform', 'translate(' + (dim / 2) + ',' + (dim + margin * axisFactor) + ')')
-                .style('text-anchor', 'middle')
-                .text('Year');
-
-            svg.append('g')
-                .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
-                .call(d3.axisLeft(y).tickValues(d3.range(ymin, ymax + step, step)));
-
-            svg.append('text')
-                .attr('transform', 'translate(' + (- margin * axisFactor) + ',' + (dim / 2) + ')rotate(' + -90 + ')')
-                .style('text-anchor', 'middle')
-                .text('Abortions');
+        while (ctr < array1.length && ctr < array2.length) {
+            result.push(array1[ctr] + array2[ctr]);
+            ctr++;
         }
 
-    </script>
-</body>
+        if (ctr === array1.length) {
+            for (x = ctr; x < array2.length; x++) {
+                result.push(array2[x]);
+            }
+        } else {
+            for (x = ctr; x < array1.length; x++) {
+                result.push(array1[x]);
+            }
+        }
+        return result;
+    }
+
+    //  Sources: 
+    //  https://www.d3-graph-gallery.com/graph/line_basic.html
+    //  https://stackoverflow.com/questions/21715201/unable-to-reference-d3-js-data-imported-from-a-csv-file-with-spaces-in-the-heade
+    async function init() {
+        const data = await d3.csv('Abortion_Demographics.csv');
+
+        const cols = data.columns.slice(8, 17);
+        console.log(cols);
+        var vals = new Array();
+
+        data.forEach(function(d) {
+            for (i = 0; i < cols.length; i++) {
+                vals.push([]);
+                vals[i].push(+d[cols[i]]);
+            }
+        });
+
+        const dim = 500;
+        const margin = 75;
+        const axisFactor = 0.5;
+
+        var svg = d3.select('svg')
+            .append('g')
+            .attr('transform', 'translate(' + margin + ',' + 10 + ')');
+
+        var x = d3.scaleTime()
+            .domain([new Date(1995, 0, 1), new Date(2012, 0, 1)])
+            .range([0, dim]);
+
+        //        var ymin = Math.floor(d3.min(data, function(d) {
+        //            return +d.total;
+        //        }) / round) * round;
+
+        var round = 100;
+        var ymin = 0;
+
+        var ymax = Math.ceil(d3.max(data, function(d) {
+            return +d.total;
+        }) / round) * round;
+
+        var step = Math.ceil((ymax + ymin) / 5000) * 500;
+
+        var y = d3.scaleLinear()
+            .domain([ymin, ymax])
+            .range([dim, 0]);
+
+        var lineChart = svg.append('path')
+            .datum(data)
+            .attr('fill', 'none')
+            .attr('stroke', 'black')
+            .attr('stroke-width', 2)
+            .attr('d', d3.line()
+                .x(function(d) {
+                    //                    console.log((+d['year']) + (+d['year']));
+                    return x(new Date(+d.year, 0, 1))
+                })
+                .y(function(d) {
+                    return y(+d.inState)
+                })
+            );
+
+        var xaxis = d3.axisBottom(x).ticks(d3.timeYear);
+
+        svg.append('g')
+            .attr('transform', 'translate(' + 0 + ',' + dim + ')')
+            .call(xaxis);
+
+        svg.append('text')
+            .attr('transform', 'translate(' + (dim / 2) + ',' + (dim + margin * axisFactor) + ')')
+            .style('text-anchor', 'middle')
+            .text('Year');
+
+
+        var yaxis = d3.axisLeft(y).tickValues(d3.range(ymin, ymax, step));
+
+        svg.append('g')
+            .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
+            .call(yaxis);
+
+        svg.append('text')
+            .attr('transform', 'translate(' + (-10 - margin * axisFactor) + ',' + (dim / 2) + ')rotate(' + -90 + ')')
+            .style('text-anchor', 'middle')
+            .text('Abortions');
+
+
+
+        function update(values) {
+            newVals = vals[values[0]];
+
+            for (i = values[0] + 1; i <= values[1]; i++) {
+                newVals = sumArr(newVals, vals[i]);
+            }
+
+            var newData = data.map(function(d, i) {
+                return {
+                    x: +d.year,
+                    y: +newVals[i]
+                };
+            });
+
+            //            ymax = Math.ceil(d3.max(newData, function(d) {
+            //                return +d.y;
+            //            }) / round) * round;
+            //            console.log(ymax);
+            //
+            //            y = d3.scaleLinear()
+            //                .domain([ymin, ymax])
+            //                .range([dim, 0]);
+            //
+            //            step = Math.ceil((ymax + ymin) / 100) * 10;
+            //
+            //            yaxis.tickValues(d3.range(ymin, ymax, step));
+            //            svg.selectAll('g.y.axis').call(yaxis);
+
+            lineChart.datum(newData)
+                .transition()
+                .duration(1000)
+                .attr('d', d3.line()
+                    .x(function(d) {
+                        return x(new Date(+d.x, 0, 1));
+                    })
+                    .y(function(d) {
+                        return y(+d.y);
+                    })
+                )
+        }
+
+        var ageLower = [0, 15, 18, 20, 25, 30, 35, 40, 45];
+        var ageUpper = [14, 17, 19, 24, 29, 34, 39, 44, 45];
+
+        $('#slider').slider({
+            range: true,
+            min: 0,
+            max: 8,
+            step: 1,
+            values: [0, 8],
+            slide: function(e, ui) {
+                if (ui.values[0] !== 8)
+                    $('.rangeLower').html(ageLower[ui.values[0]] + ' - ');
+                else $('.rangeLower').html('');
+
+                if (ui.values[1] !== 8)
+                    $('.rangeUpper').html(ageUpper[ui.values[1]]);
+                else
+                    $('.rangeUpper').html(ageUpper[ui.values[1]] + '+');
+
+                update(ui.values)
+            }
+        });
+
+        var values = $('#slider').slider('option', 'values');
+
+        //        $('.btn').click(function() {
+        //            $(this).html(values[0]);
+        //        });
+    }
+
+</script>
+
 
 </html>
