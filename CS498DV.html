@@ -5,14 +5,16 @@
 <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
 <!--Source for slider: https://codepen.io/caseymhunt/pen/kertA-->
 <style>
+    /*not optimized for viewing on mobile or tablet*/
     @import url('slider.css');
 
-    #btn {
-        margin: 4px;
+    body {
+        overflow: hidden;
     }
 
     .container {
         margin: auto;
+        margin-left: 30%;
         text-align: center;
     }
 
@@ -22,13 +24,23 @@
         height: 500px;
         position: absolute;
         margin-top: -250px;
-        margin-left: -450px;
+        margin-left: -430px;
         top: 50%;
-        left: 50%;
+        left: 65%;
+    }
+
+    #dualSlider {
+        width: 500px;
+        margin: auto;
+        position: absolute;
+        bottom: 0;
+        left: 65%;
+        margin-left: -250px;
+        padding: 10px;
     }
 
     .note {
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .svg {
@@ -40,19 +52,66 @@
         font-family: sans-serif;
     }
 
+    .story {
+        border-radius: 0 45 0 45;
+        background-color: #00000011;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: calc(58% - 410px);
+        height: 100%;
+    }
+
+    .btn {
+        padding: 3px;
+        width: 40px;
+        height: 24px;
+        text-align: center;
+        position: absolute;
+        bottom: 65px;
+    }
+
+    .btn:active {
+        padding: 4px;
+    }
+
+    #bs {
+        margin-left: -75px;
+    }
+
+    #b1 {
+        margin-left: -25px;
+    }
+
+    #b2 {
+        margin-left: 25px;
+    }
+
+    #b3 {
+        margin-left: 75px;
+    }
+
 </style>
 
 <body onload='init()'>
+
+    <div class='story'>
+
+    </div>
 
     <div class='container'>
         <h3>Abortions in Illinois from 1995 - 2012</h3>
         <svg class='chart' width=1000 height=500 preserveAspectRatio='xMidYMid meet' /><br />
 
-        <!--        <button class='btn' type='button'>Button</button>-->
+        <span class='note'></span><br />
+        <button class='btn' id='bs' type='button'>S</button>
+        <button class='btn' id='b1' type='button'>1</button>
+        <button class='btn' id='b2' type='button'>2</button>
+        <button class='btn' id='b3' type='button'>3</button>
 
         <div id='dualSlider'>
             <p>Age Range: <span class='rangeLower'>0 - </span>
-                <span class='rangeUpper'>45+</span><br /><span class='note'></span>
+                <span class='rangeUpper'>45+</span><br />
 
             </p>
             <div class='sliderStep'>
@@ -72,6 +131,12 @@
 
         const cols = data.columns.slice(8, 17);
         var vals = new Array();
+        var currY = data.map(function(d, i) {
+            return {
+                x: +d.year,
+                y: +d.inState
+            };
+        });
 
         data.forEach(function(d) {
             for (i = 0; i < cols.length; i++) {
@@ -138,7 +203,7 @@
             .style('text-anchor', 'middle')
             .text('Abortions');
 
-
+        $('#bs').click();
 
         function update(values) {
             newVals = vals[values[0]];
@@ -153,6 +218,8 @@
                     y: +newVals[i]
                 };
             });
+
+            currY = newData;
 
             ymin = Math.floor(d3.min(newData, function(d) {
                 return +d.y;
@@ -188,8 +255,10 @@
             min: 0,
             max: 8,
             step: 1,
+            value: 0,
             values: [0, 8],
             slide: function(e, ui) {
+                console.log('sliding');
                 if (ui.values[0] !== 8)
                     $('.rangeLower').html(ageLower[ui.values[0]] + ' - ');
                 else $('.rangeLower').html('');
@@ -200,7 +269,24 @@
                     $('.rangeUpper').html(ageUpper[ui.values[1]] + '+');
 
                 if (ui.values[0] == 8 && ui.values[1] == 8)
-                    $('.note').html('\n†data values below or equal to 50 are recorded as 50.');
+                    $('.note').html('\n†data values ≤50 are recorded as 50.');
+                else
+                    $('.note').html('');
+
+                update(ui.values)
+            },
+            change: function(e, ui) {
+                if (ui.values[0] !== 8)
+                    $('.rangeLower').html(ageLower[ui.values[0]] + ' - ');
+                else $('.rangeLower').html('');
+
+                if (ui.values[1] !== 8)
+                    $('.rangeUpper').html(ageUpper[ui.values[1]]);
+                else
+                    $('.rangeUpper').html(ageUpper[ui.values[1]] + '+');
+
+                if (ui.values[0] == 8 && ui.values[1] == 8)
+                    $('.note').html('\n†data values ≤50 are recorded as 50.');
                 else
                     $('.note').html('');
 
@@ -210,9 +296,35 @@
 
         var values = $('#slider').slider('option', 'values');
 
-        //        $('.btn').click(function() {
-        //            $(this).html(values[0]);
-        //        });
+        $('#bs').click(function() {
+            $("#slider").slider('values', 0, 0);
+            $("#slider").slider('values', 1, 8);
+            $slider = $('#slider');
+            $slider.slider('change').call($slider);
+        });
+
+        //        $('#bs').click();
+
+        $('#b1').click(function() {
+            $("#slider").slider('values', 0, 0);
+            $("#slider").slider('values', 1, 3);
+            $slider = $('#slider');
+            $slider.slider('change').call($slider);
+        });
+
+        $('#b2').click(function() {
+            $("#slider").slider('values', 0, 6);
+            $("#slider").slider('values', 1, 6);
+            $slider = $('#slider');
+            $slider.slider('change').call($slider);
+        });
+
+        $('#b3').click(function() {
+            $("#slider").slider('values', 0, 8);
+            $("#slider").slider('values', 1, 8);
+            $slider = $('#slider');
+            $slider.slider('change').call($slider);
+        });
     }
 
 </script>

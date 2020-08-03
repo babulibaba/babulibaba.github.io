@@ -1,4 +1,0 @@
-3 pages
-1. broken down by age (range)
-2. broken down by marital status
-3. in state vs out of state
