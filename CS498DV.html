@@ -65,7 +65,8 @@
                 vals[i].push(+d[cols[i]]);
             }
         });
-
+        
+        const round = 1000;
         const dim = 500;
         const margin = 75;
         const axisFactor = 0.5;
@@ -78,18 +79,15 @@
             .domain([new Date(1995, 0, 1), new Date(2012, 0, 1)])
             .range([0, dim]);
 
-        //        var ymin = Math.floor(d3.min(data, function(d) {
-        //            return +d.total;
-        //        }) / round) * round;
-
-        var round = 100;
-        var ymin = 0;
-
-        var ymax = Math.ceil(d3.max(data, function(d) {
-            return +d.total;
+        var ymin = Math.floor(d3.min(data, function(d) {
+            return +d.inState;
         }) / round) * round;
 
-        var step = Math.ceil((ymax + ymin) / 5000) * 500;
+        var ymax = Math.ceil(d3.max(data, function(d) {
+            return +d.inState;
+        }) / round) * round;
+
+        var step = Math.ceil((ymax + ymin) / 1000) * 100;
 
         var y = d3.scaleLinear()
             .domain([ymin, ymax])
@@ -121,12 +119,9 @@
             .style('text-anchor', 'middle')
             .text('Year');
 
-
-        var yaxis = d3.axisLeft(y).tickValues(d3.range(ymin, ymax, step));
-
-        svg.append('g')
+        var yaxis = svg.append('g')
             .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
-            .call(yaxis);
+            .call(d3.axisLeft(y).ticks(10));
 
         svg.append('text')
             .attr('transform', 'translate(' + (-10 - margin * axisFactor) + ',' + (dim / 2) + ')rotate(' + -90 + ')')
@@ -149,21 +144,19 @@
                 };
             });
 
-            //            ymax = Math.ceil(d3.max(newData, function(d) {
-            //                return +d.y;
-            //            }) / round) * round;
-            //            console.log(ymax);
-            //
-            //            y = d3.scaleLinear()
-            //                .domain([ymin, ymax])
-            //                .range([dim, 0]);
-            //
-            //            step = Math.ceil((ymax + ymin) / 100) * 10;
-            //
-            //            yaxis.tickValues(d3.range(ymin, ymax, step));
-            //            svg.selectAll('g.y.axis').call(d3.axisLeft(y).tickFormat(function(d, i) {
-            //                return step * i;
-            //            }));
+            ymin = Math.floor(d3.min(newData, function(d) {
+                return +d.y;
+            }) / round) * round;
+
+            ymax = Math.ceil(d3.max(newData, function(d) {
+                return +d.y;
+            }) / round) * round;
+            console.log(ymax);
+
+            y = d3.scaleLinear()
+                .domain([ymin, ymax])
+                .range([dim, 0]);
+            yaxis.transition().duration(1000).call(d3.axisLeft(y).ticks(10));
 
             lineChart.datum(newData)
                 .transition()
