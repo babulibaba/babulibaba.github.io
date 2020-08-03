@@ -10,11 +10,12 @@
 
     body {
         overflow: hidden;
+        font-family: sans-serif;
     }
 
     .container {
         margin: auto;
-        margin-left: 30%;
+        /*        margin-left: 30%;*/
         text-align: center;
     }
 
@@ -26,7 +27,7 @@
         margin-top: -250px;
         margin-left: -430px;
         top: 50%;
-        left: 65%;
+        left: 50%;
     }
 
     #dualSlider {
@@ -34,7 +35,7 @@
         margin: auto;
         position: absolute;
         bottom: 0;
-        left: 65%;
+        left: 50%;
         margin-left: -250px;
         padding: 10px;
     }
@@ -48,18 +49,32 @@
         width: 1000px;
     }
 
-    h3 {
-        font-family: sans-serif;
+    h5 {
+        font-size: 20px;
+    }
+
+    .story h5,
+    p {
+        margin-left: 8px;
+        margin-right: 8px;
+        margin-top: 10px;
+    }
+
+    .story p {
+        font-size: 14px;
+        text-align: justify;
+        text-justify: inter-word;
     }
 
     .story {
-        border-radius: 0 45 0 45;
-        background-color: #00000011;
+        border-radius: 0 5px 5px 0;
+        background-color: #00000077;
         position: fixed;
         top: 0;
         left: 0;
-        width: calc(58% - 410px);
+        width: calc(50% - 450px);
         height: 100%;
+        color: aliceblue;
     }
 
     .btn {
@@ -96,7 +111,10 @@
 <body onload='init()'>
 
     <div class='story'>
-
+        <h5 id='title'>In-State Residents</h5>
+        <p id='content'>
+            Here we have abortions had by Illinois state residents based on age over a 12 span period from 1995 - 2012. There is an evident decline in abortion in the late 1990s, while the rest of the data doesn't show any obvious trends. There is a peak in 1996 of 49,457 abortions, while the lowest number was in 2011 with 37,922 abortions.
+        </p>
     </div>
 
     <div class='container'>
@@ -296,35 +314,38 @@
 
         var values = $('#slider').slider('option', 'values');
 
-        $('#bs').click(function() {
-            $("#slider").slider('values', 0, 0);
-            $("#slider").slider('values', 1, 8);
+        function modSlider(v0, v1) {
+            $('#slider').slider('values', 0, v0);
+            $('#slider').slider('values', 1, v1);
             $slider = $('#slider');
             $slider.slider('change').call($slider);
+        }
+
+        $('#bs').click(function() {
+            $('#title').html('In-State Residents');
+            $('#content').html('Here we have abortions had by Illinois state residents based on age over a 12 span period from 1995 - 2012. There is an evident decline in abortion in the late 1990s, while the rest of the data doesn\'t show any obvious trends. There is a peak in 1996 of 49,457 abortions, while the lowest number was in 2011 with 37,922 abortions.');
+            modSlider(0, 8);
         });
 
-        //        $('#bs').click();
-
         $('#b1').click(function() {
-            $("#slider").slider('values', 0, 0);
-            $("#slider").slider('values', 1, 3);
-            $slider = $('#slider');
-            $slider.slider('change').call($slider);
+            $('#title').html('Steep deline in adolescent abortions');
+            $('#content').html('Over this time period, the number of abortions had by adolescent residents dropped significantly. The number of abortions dropped yearly for 9 years, until 2004. Over the couse of the 12 year time span, the number of abortions dropped by over 50%.');
+            modSlider(0, 1);
         });
 
         $('#b2').click(function() {
-            $("#slider").slider('values', 0, 6);
-            $("#slider").slider('values', 1, 6);
-            $slider = $('#slider');
-            $slider.slider('change').call($slider);
+            $('#title').html('Flaw in the data');
+            $('#content').html('Within the dataset, any values below or equal to 50 were recorded as \'≤50\'. This can only be seen in the 45+ age group, but it has a definite negative impact on the depth data as we lose many values there.');
+            modSlider(8, 8);
         });
 
         $('#b3').click(function() {
-            $("#slider").slider('values', 0, 8);
-            $("#slider").slider('values', 1, 8);
-            $slider = $('#slider');
-            $slider.slider('change').call($slider);
+            $('#title').html('Most consistent age range');
+            $('#content').html('The age group with the least change in number of abortions was the 35-39 year old age range. This group saw less than a 1.3% decrease in abortions over the 12 years. Many assumptions could be made as to why this is, however it is uncertain without further research or possible extensive studies.');
+            modSlider(6, 6);
         });
+
+        //        $('#bs').click();
     }
 
 </script>
