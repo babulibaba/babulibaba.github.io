@@ -13,17 +13,31 @@
 
     .container {
         margin: auto;
-        width: 50%;
-        padding: 10px;
+        text-align: center;
     }
 
     .chart {
-        margin-left: -120px;
-        margin-bottom: -100px;
+        width: 1000px;
+        padding: 10px;
+        height: 500px;
+        position: absolute;
+        margin-top: -250px;
+        margin-left: -450px;
+        top: 50%;
+        left: 50%;
     }
 
-    p {
-        margin-left: 100px;
+    .note {
+        font-size: 8px;
+    }
+
+    .svg {
+        display: block;
+        width: 1000px;
+    }
+
+    h3 {
+        font-family: sans-serif;
     }
 
 </style>
@@ -31,14 +45,14 @@
 <body onload='init()'>
 
     <div class='container'>
-        <p>Abortions in Illinois from 1995 - 2012</p>
-        <svg class='chart' width=650 height=650 preserveAspectRatio='xMidYMid meet' /><br />
+        <h3>Abortions in Illinois from 1995 - 2012</h3>
+        <svg class='chart' width=1000 height=500 preserveAspectRatio='xMidYMid meet' /><br />
 
         <!--        <button class='btn' type='button'>Button</button>-->
 
         <div id='dualSlider'>
             <p>Age Range: <span class='rangeLower'>0 - </span>
-                <span class='rangeUpper'>45+</span>
+                <span class='rangeUpper'>45+</span><br /><span class='note'></span>
 
             </p>
             <div class='sliderStep'>
@@ -65,9 +79,10 @@
                 vals[i].push(+d[cols[i]]);
             }
         });
-        
-        const round = 1000;
-        const dim = 500;
+
+        const round = 500;
+        const dim = 350;
+        const width = dim * 2;
         const margin = 75;
         const axisFactor = 0.5;
 
@@ -77,7 +92,7 @@
 
         var x = d3.scaleTime()
             .domain([new Date(1995, 0, 1), new Date(2012, 0, 1)])
-            .range([0, dim]);
+            .range([0, width]);
 
         var ymin = Math.floor(d3.min(data, function(d) {
             return +d.inState;
@@ -87,8 +102,6 @@
             return +d.inState;
         }) / round) * round;
 
-        var step = Math.ceil((ymax + ymin) / 1000) * 100;
-
         var y = d3.scaleLinear()
             .domain([ymin, ymax])
             .range([dim, 0]);
@@ -96,11 +109,10 @@
         var lineChart = svg.append('path')
             .datum(data)
             .attr('fill', 'none')
-            .attr('stroke', 'black')
+            .attr('stroke', 'purple')
             .attr('stroke-width', 2)
             .attr('d', d3.line()
                 .x(function(d) {
-                    //                    console.log((+d['year']) + (+d['year']));
                     return x(new Date(+d.year, 0, 1))
                 })
                 .y(function(d) {
@@ -108,14 +120,12 @@
                 })
             );
 
-        var xaxis = d3.axisBottom(x).ticks(d3.timeYear);
-
-        svg.append('g')
+        var xaxis = svg.append('g')
             .attr('transform', 'translate(' + 0 + ',' + dim + ')')
-            .call(xaxis);
+            .call(d3.axisBottom(x).ticks(d3.timeYear));
 
         svg.append('text')
-            .attr('transform', 'translate(' + (dim / 2) + ',' + (dim + margin * axisFactor) + ')')
+            .attr('transform', 'translate(' + (width / 2) + ',' + (dim + margin * axisFactor) + ')')
             .style('text-anchor', 'middle')
             .text('Year');
 
@@ -151,16 +161,15 @@
             ymax = Math.ceil(d3.max(newData, function(d) {
                 return +d.y;
             }) / round) * round;
-            console.log(ymax);
 
             y = d3.scaleLinear()
                 .domain([ymin, ymax])
                 .range([dim, 0]);
-            yaxis.transition().duration(1000).call(d3.axisLeft(y).ticks(10));
+            yaxis.transition().duration(1700).call(d3.axisLeft(y).ticks(10));
 
             lineChart.datum(newData)
                 .transition()
-                .duration(1000)
+                .duration(1700)
                 .attr('d', d3.line()
                     .x(function(d) {
                         return x(new Date(+d.x, 0, 1));
@@ -189,6 +198,11 @@
                     $('.rangeUpper').html(ageUpper[ui.values[1]]);
                 else
                     $('.rangeUpper').html(ageUpper[ui.values[1]] + '+');
+
+                if (ui.values[0] == 8 && ui.values[1] == 8)
+                    $('.note').html('\n†data values below or equal to 50 are recorded as 50.');
+                else
+                    $('.note').html('');
 
                 update(ui.values)
             }

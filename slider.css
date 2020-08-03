@@ -5,6 +5,7 @@ Source: https://codepen.io/caseymhunt/pen/kertA
     font-family: "Arial", sans-serif;
     font-size: 14px;
     color: #333;
+    text-align: center;
 }
 
 .ui-slider-horizontal {
@@ -13,7 +14,7 @@ Source: https://codepen.io/caseymhunt/pen/kertA
     border: 1px solid #BABABA;
     box-shadow: 0 1px 0 #FFF, 0 1px 0 #CFCFCF inset;
     clear: both;
-/*    margin: 8px 0;*/
+    /*    margin: 8px 0;*/
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     -ms-border-radius: 6px;
@@ -115,5 +116,11 @@ Source: https://codepen.io/caseymhunt/pen/kertA
 }
 
 #dualSlider {
-    width: 400px;
+    width: 500px;
+    margin: auto;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -250px;
+    padding: 10px;
 }
